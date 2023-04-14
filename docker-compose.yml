@@ -1,0 +1,40 @@
+version: "3.9"
+services:
+
+  sql-server:
+    image: "mcr.microsoft.com/mssql/server:latest"
+    container_name: sql-server
+    ports:
+      - 1433:1433 
+    environment:
+      - ACCEPT_EULA=y
+      - SA_PASSWORD=My!Strong@Password#
+     
+  sms-web-client:
+    image: mmd744/sms-web-client
+    container_name: sms-web-client
+    ports:
+      - 4200:4200
+      
+  rabbitmq:
+    image: rabbitmq:3.11-management
+    container_name: rabbitmqCompose
+    ports:
+      - 15672:15672
+      - 5672:5672
+
+  sms-web-service:
+    image: mmd744/sms-web-service
+    container_name: sms-web-service
+    ports:
+      - 5000:80
+    depends_on:
+      - sql-server
+  
+  sms-queue-listener:
+    image: mmd744/sms-queue-listener
+    container_name: sms-queue-listener
+    ports:
+      - 6000:80
+    depends_on:
+      - rabbitmq
